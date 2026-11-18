@@ -18,6 +18,12 @@ export function createInitialOrder() {
   return FRUIT_MOCHI_TYPES[randomIndex];
 }
 
+export function createNextOrder(previousOrder) {
+  const candidates = FRUIT_MOCHI_TYPES.filter((type) => type !== previousOrder);
+
+  return Phaser.Utils.Array.GetRandom(candidates);
+}
+
 export function getMochiColor(order) {
   return FRUIT_MOCHI_COLORS[order];
 }

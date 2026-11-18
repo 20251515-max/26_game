@@ -11,3 +11,4 @@
 2026-11-18 16:24 / 주문 모찌 과일별 일러스트 적용 / js/scenes/PlayScene.js, prompt.txt, work-log.md / 이미지 파일 없이 과일 고유의 씨·알갱이·잎·과육 형태를 코드로 그려 주문 종류를 시각적으로 구분함
 2026-11-18 16:27 / 조합형 모찌 제작 조작 추가 / js/production/MochiMaker.js, js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 찹쌀 반죽을 먼저 선택하고 과일 재료를 선택해야 모찌가 완성되도록 제작 규칙과 화면 조작을 분리해 구현함
 2026-11-18 16:34 / MVP 규칙 상수 확정 및 초기 시간·주문 정보 표시 / js/config/GameRules.js, js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 사용자가 고른 시간·과일별 금액·단계별 확장 비용·판매 개수 목표를 한 규칙 모듈에 모아 이후 판매·타이머·확장 작업이 같은 값을 쓰게 함
+2026-11-18 16:40 / 연속 주문 제작·판매와 귀여운 연출 추가 / js/scenes/PlayScene.js, js/orders/Order.js, js/ui/CuteShapes.js, tasks.md, prompt.txt, work-log.md / 주문 일치 시 판매·다음 주문으로 루프를 잇고, 사용자가 고른 손님 캐릭터·통통 애니메이션·배경 장식을 도형 모듈로 분리해 추가함
