@@ -41,13 +41,15 @@ export class StartScene extends Phaser.Scene {
     graphics.lineStyle(5, 0x5a466b, 1);
     graphics.strokeRoundedRect(495, 440, 290, 82, 28);
 
-    const startButton = this.add.text(640, 479, '시작하기', {
+    this.add.text(640, 479, '시작하기', {
       color: '#ffffff',
       fontFamily: 'sans-serif',
       fontSize: '28px',
       fontStyle: 'bold',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true, pixelPerfect: true });
+    }).setOrigin(0.5);
 
+    const startButton = this.add.zone(640, 487, 290, 94)
+      .setInteractive({ useHandCursor: true });
     startButton.on('pointerdown', () => {
       this.scene.start('PlayScene');
     });
