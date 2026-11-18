@@ -1,3 +1,5 @@
+import { playSound } from '../audio/SoundEffects.js';
+
 export class StartScene extends Phaser.Scene {
   constructor() {
     super('StartScene');
@@ -59,7 +61,10 @@ export class StartScene extends Phaser.Scene {
 
     const button = this.add.zone(x + 135, 487, 270, 94)
       .setInteractive({ useHandCursor: true });
-    button.on('pointerdown', onClick);
+    button.on('pointerdown', () => {
+      playSound(this, 'button');
+      onClick();
+    });
   }
 
   createMochi(graphics, x, y) {

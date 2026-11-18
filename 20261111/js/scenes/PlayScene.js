@@ -12,6 +12,7 @@ import {
   drawStar,
 } from '../ui/CuteShapes.js';
 import { TUTORIAL_ORDER, TutorialGuide } from '../tutorial/TutorialGuide.js';
+import { playSound } from '../audio/SoundEffects.js';
 
 const BOARD_X = 817;
 const BOARD_Y = 307;
@@ -98,19 +99,21 @@ export class PlayScene extends Phaser.Scene {
     this.remainingSeconds -= 1;
     this.timeText.setText(this.formatTime(this.remainingSeconds));
 
-    if (this.remainingSeconds <= 10) {
+    if (this.remainingSeconds <= 10 && this.remainingSeconds > 0) {
       this.popText(this.timeText);
+      playSound(this, 'tick');
     }
 
     if (this.remainingSeconds <= 0) {
-      this.finishGame('시간 종료!', `시간이 끝났어요. 실패! (판매 ${this.salesCount}개, ${this.money}원)`);
+      this.finishGame('시간 종료!', `시간이 끝났어요. 실패! (판매 ${this.salesCount}개, ${this.money}원)`, 'fail');
     }
   }
 
-  finishGame(workshopMessage, resultMessage) {
+  finishGame(workshopMessage, resultMessage, sound) {
     this.isPlaying = false;
     this.countdown.remove();
     this.workshopMessage.setText(workshopMessage);
+    this.time.delayedCall(300, () => playSound(this, sound));
 
     this.time.delayedCall(1200, () => {
       this.scene.start('ResultScene', { message: resultMessage });
@@ -336,9 +339,11 @@ export class PlayScene extends Phaser.Scene {
 
     if (!this.maker.placeDough()) {
       this.workshopMessage.setText('작업대의 반죽을 먼저 완성하세요');
+      playSound(this, 'error');
       return;
     }
 
+    playSound(this, 'doughPlace');
     this.notifyTutorial('doughPlaced');
     this.resetWorkGraphics();
     this.drawWorkStage();
@@ -361,12 +366,14 @@ export class PlayScene extends Phaser.Scene {
       };
 
       this.workshopMessage.setText(messages[this.maker.step]);
+      playSound(this, 'error');
       return;
     }
 
     this.drawWorkStage();
     this.squashDough();
     this.workshopMessage.setText(`반죽을 클릭해 과일을 감싸 주세요 (0/${WRAP_CLICKS})`);
+    playSound(this, 'fruit');
     this.notifyTutorial('fruitAdded');
   }
 
@@ -381,6 +388,7 @@ export class PlayScene extends Phaser.Scene {
       this.workshopMessage.setText(
         this.maker.step === 'rolled' ? '과일 그림을 클릭해 반죽 위에 올리세요' : '반죽 그림을 클릭해 작업대에 올리세요',
       );
+      playSound(this, 'error');
       return;
     }
 
@@ -390,6 +398,7 @@ export class PlayScene extends Phaser.Scene {
       this.drawWorkStage();
       this.squashDough();
       this.sweepPin();
+      playSound(this, 'roll');
       this.workshopMessage.setText(
         this.maker.step === 'rolled'
           ? '반죽을 다 밀었어요! 과일 그림을 클릭하세요'
@@ -397,6 +406,7 @@ export class PlayScene extends Phaser.Scene {
       );
 
       if (this.maker.step === 'rolled') {
+        playSound(this, 'rollDone');
         this.notifyTutorial('rolled');
       }
       return;
@@ -406,6 +416,7 @@ export class PlayScene extends Phaser.Scene {
       this.drawWorkStage();
       this.squashDough();
       this.workshopMessage.setText(`반죽으로 감싸는 중 (${this.maker.wrapCount}/${WRAP_CLICKS})`);
+      playSound(this, 'wrap');
       return;
     }
 
@@ -499,9 +510,11 @@ export class PlayScene extends Phaser.Scene {
     this.resetWorkGraphics();
     this.drawFruitMochi(this.workGraphics, 0, 0, mochi);
     this.workGraphics.setScale(0.7);
+    playSound(this, 'complete');
 
     if (mochi !== this.order) {
       this.workshopMessage.setText(`${mochi}는 주문과 달라요. 다시 만들어 보세요`);
+      this.time.delayedCall(200, () => playSound(this, 'wrong'));
       this.tweens.add({ targets: this.workGraphics, scale: 1, duration: 250, ease: 'Back.easeOut' });
       this.tweens.add({
         targets: this.workGraphics,
@@ -527,6 +540,7 @@ export class PlayScene extends Phaser.Scene {
     this.workshopMessage.setText(`${mochi} 판매 완료! +${price}원`);
     this.popText(this.moneyText);
     this.showFloatingText(1115, 140, `+${price}원`);
+    this.time.delayedCall(150, () => playSound(this, 'sell'));
 
     // 완성된 모찌가 통 튄 뒤 손님에게 날아간다.
     this.tweens.add({
@@ -554,10 +568,12 @@ export class PlayScene extends Phaser.Scene {
       this.finishGame(
         `목표 ${GOAL_SALES}개 달성!`,
         `목표 달성! 성공! (판매 ${this.salesCount}개, ${this.money}원)`,
+        'success',
       );
       return;
     }
 
+    this.time.delayedCall(500, () => playSound(this, 'customer'));
     this.showOrder(createNextOrder(this.order));
   }
 
@@ -649,6 +665,7 @@ export class PlayScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     button.on('pointerdown', () => {
       face.y = y + 6;
+      playSound(this, 'button');
       onClick();
     });
     button.on('pointerup', () => {

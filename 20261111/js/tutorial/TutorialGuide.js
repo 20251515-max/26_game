@@ -1,4 +1,5 @@
 import { GOAL_SALES, TIME_LIMIT_SECONDS } from '../config/GameRules.js';
+import { playSound } from '../audio/SoundEffects.js';
 import { ROLL_CLICKS, WRAP_CLICKS } from '../production/MochiMaker.js';
 
 export const TUTORIAL_ORDER = '딸기 모찌';
@@ -100,6 +101,7 @@ export class TutorialGuide {
       this.scene.workshopMessage.setText(`주문은 ${TUTORIAL_ORDER}예요. ${TUTORIAL_FRUIT}를 골라 주세요`);
     }
 
+    playSound(this.scene, 'error');
     this.nudgePanel();
     return false;
   }
@@ -191,6 +193,7 @@ export class TutorialGuide {
       .setDepth(DEPTH);
     this.nextZone.on('pointerdown', () => {
       if (!this.step.waitFor) {
+        playSound(this.scene, 'next');
         this.goToStep(this.stepIndex + 1);
       }
     });

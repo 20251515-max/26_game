@@ -1,0 +1,2 @@
+2026-11-18 17:04 / 추천 효과음(●·◐) 추가 / js/audio/SoundEffects.js, js/scenes/PlayScene.js, js/scenes/StartScene.js, js/scenes/ResultScene.js, js/tutorial/TutorialGuide.js, prompt.txt, work-log.md / 소리 파일이 없어 Web Audio로 효과음을 합성하고, 잦은 밀기·감싸기 소리는 작고 짧게 높낮이를 흔들며 겹치는 소리는 시간차를 둠
+2026-11-18 17:06 / 20261111 폴더를 최상위로 하는 새 GitHub 저장소 업로드 방법 안내 / prompt.txt, work-log.md / CLAUDE.md의 git 직접 실행 금지 규칙에 따라 명령은 실행하지 않고, 기존 저장소를 건드리지 않는 subtree split 절차를 정리함

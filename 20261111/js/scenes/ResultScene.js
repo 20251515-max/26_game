@@ -1,3 +1,5 @@
+import { playSound } from '../audio/SoundEffects.js';
+
 export class ResultScene extends Phaser.Scene {
   constructor() {
     super('ResultScene');
@@ -30,6 +32,7 @@ export class ResultScene extends Phaser.Scene {
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     retryButton.on('pointerdown', () => {
+      playSound(this, 'button');
       this.scene.start('PlayScene', { tutorial: false });
     });
   }
