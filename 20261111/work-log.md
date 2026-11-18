@@ -12,3 +12,6 @@
 2026-11-18 16:27 / 조합형 모찌 제작 조작 추가 / js/production/MochiMaker.js, js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 찹쌀 반죽을 먼저 선택하고 과일 재료를 선택해야 모찌가 완성되도록 제작 규칙과 화면 조작을 분리해 구현함
 2026-11-18 16:34 / MVP 규칙 상수 확정 및 초기 시간·주문 정보 표시 / js/config/GameRules.js, js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 사용자가 고른 시간·과일별 금액·단계별 확장 비용·판매 개수 목표를 한 규칙 모듈에 모아 이후 판매·타이머·확장 작업이 같은 값을 쓰게 함
 2026-11-18 16:40 / 연속 주문 제작·판매와 귀여운 연출 추가 / js/scenes/PlayScene.js, js/orders/Order.js, js/ui/CuteShapes.js, tasks.md, prompt.txt, work-log.md / 주문 일치 시 판매·다음 주문으로 루프를 잇고, 사용자가 고른 손님 캐릭터·통통 애니메이션·배경 장식을 도형 모듈로 분리해 추가함
+2026-11-18 16:42 / 제한 시간 감소와 시간 종료 실패 처리 / js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 1초 반복 타이머로 남은 시간을 갱신하고, 0초가 되면 제작 입력을 막은 뒤 실패 결과 화면으로 이동하게 함
+2026-11-18 16:43 / 목표 판매 달성 시 성공 처리 / js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 시간 종료와 같은 종료 함수를 공유해 목표 개수 판매 즉시 입력·타이머를 멈추고 성공 결과로 이동하게 함
+2026-11-18 16:48 / 그림 클릭과 밀기·감싸기 단계로 제작 방식 변경 / js/production/MochiMaker.js, js/scenes/PlayScene.js, js/ui/CuteShapes.js, js/config/GameRules.js, prompt.txt, work-log.md / 사용자가 고른 클릭 방식으로 반죽 올리기→3번 밀기→과일 올리기→3번 감싸기 단계를 제작 모듈에 두고, 단계가 늘어난 만큼 제한 시간을 90초로 늘림
