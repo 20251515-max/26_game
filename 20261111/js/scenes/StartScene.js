@@ -34,25 +34,32 @@ export class StartScene extends Phaser.Scene {
       fontSize: '24px',
     }).setOrigin(0.5);
 
-    graphics.fillStyle(0xc98aa2, 1);
-    graphics.fillRoundedRect(495, 452, 290, 82, 28);
-    graphics.fillStyle(0xffa9c0, 1);
-    graphics.fillRoundedRect(495, 440, 290, 82, 28);
-    graphics.lineStyle(5, 0x5a466b, 1);
-    graphics.strokeRoundedRect(495, 440, 290, 82, 28);
+    this.createButton(graphics, 355, 0xffa9c0, 0xc98aa2, '시작하기', () => {
+      this.scene.start('PlayScene', { tutorial: false });
+    });
+    this.createButton(graphics, 655, 0x8fd48a, 0x6aa866, '연습하기', () => {
+      this.scene.start('PlayScene', { tutorial: true });
+    });
+  }
 
-    this.add.text(640, 479, '시작하기', {
+  createButton(graphics, x, color, shadowColor, label, onClick) {
+    graphics.fillStyle(shadowColor, 1);
+    graphics.fillRoundedRect(x, 452, 270, 82, 28);
+    graphics.fillStyle(color, 1);
+    graphics.fillRoundedRect(x, 440, 270, 82, 28);
+    graphics.lineStyle(5, 0x5a466b, 1);
+    graphics.strokeRoundedRect(x, 440, 270, 82, 28);
+
+    this.add.text(x + 135, 479, label, {
       color: '#ffffff',
       fontFamily: 'sans-serif',
       fontSize: '28px',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    const startButton = this.add.zone(640, 487, 290, 94)
+    const button = this.add.zone(x + 135, 487, 270, 94)
       .setInteractive({ useHandCursor: true });
-    startButton.on('pointerdown', () => {
-      this.scene.start('PlayScene');
-    });
+    button.on('pointerdown', onClick);
   }
 
   createMochi(graphics, x, y) {

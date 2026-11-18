@@ -11,6 +11,7 @@ import {
   drawRollingPin,
   drawStar,
 } from '../ui/CuteShapes.js';
+import { TUTORIAL_ORDER, TutorialGuide } from '../tutorial/TutorialGuide.js';
 
 const BOARD_X = 817;
 const BOARD_Y = 307;
@@ -23,6 +24,10 @@ const CUSTOMER_BOW_COLORS = [0xffa9c0, 0x9fd0ff, 0x9ed99a, 0xc6b3ff];
 export class PlayScene extends Phaser.Scene {
   constructor() {
     super('PlayScene');
+  }
+
+  init(data) {
+    this.isTutorial = Boolean(data && data.tutorial);
   }
 
   create() {
@@ -44,7 +49,9 @@ export class PlayScene extends Phaser.Scene {
 
     this.isPlaying = true;
     this.remainingSeconds = TIME_LIMIT_SECONDS;
-    this.timeText = this.createStatusCard(graphics, 805, 32, 180, 92, 0xe8dfff, '남은 시간', this.formatTime(this.remainingSeconds));
+    this.timeText = this.createStatusCard(graphics, 805, 32, 180, 92, 0xe8dfff, '남은 시간',
+      this.isTutorial ? '연습' : this.formatTime(this.remainingSeconds),
+    );
     this.moneyText = this.createStatusCard(graphics, 1005, 32, 220, 92, 0xffdde7, '보유 금액', '0원');
     this.createOrderPanel(graphics);
     this.createWorkshop(graphics);
@@ -57,12 +64,23 @@ export class PlayScene extends Phaser.Scene {
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(640, 115, '주문에 맞는 모찌를 만들어 보세요!', {
+    this.add.text(640, 115, this.isTutorial ? '연습 모드 - 천천히 따라 해 보세요!' : '주문에 맞는 모찌를 만들어 보세요!', {
       color: '#5a466b',
       fontFamily: 'sans-serif',
       fontSize: '22px',
     }).setOrigin(0.5);
 
+    if (this.isTutorial) {
+      this.createButton(870, 600, 220, 60, 0x8fd48a, '실전 시작', () => {
+        this.scene.start('PlayScene', { tutorial: false });
+      });
+      this.showOrder(TUTORIAL_ORDER);
+      this.tutorial = new TutorialGuide(this);
+      this.tutorial.start();
+      return;
+    }
+
+    this.tutorial = null;
     this.createButton(870, 600, 220, 60, 0xffa9c0, '결과 화면 보기', () => {
       this.scene.start('ResultScene', { message: '이번 판이 끝났습니다.' });
     });
@@ -300,8 +318,19 @@ export class PlayScene extends Phaser.Scene {
     });
   }
 
+  // 연습 안내 중에는 지금 단계에서 허용한 조작만 할 수 있다.
+  allowsAction(action, fruit) {
+    return !this.tutorial || this.tutorial.allows(action, fruit);
+  }
+
+  notifyTutorial(event) {
+    if (this.tutorial) {
+      this.tutorial.notify(event);
+    }
+  }
+
   placeDough() {
-    if (!this.isPlaying) {
+    if (!this.isPlaying || !this.allowsAction('dough')) {
       return;
     }
 
@@ -310,6 +339,7 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
 
+    this.notifyTutorial('doughPlaced');
     this.resetWorkGraphics();
     this.drawWorkStage();
     this.workGraphics.setScale(0);
@@ -319,7 +349,7 @@ export class PlayScene extends Phaser.Scene {
   }
 
   addFruit(fruit) {
-    if (!this.isPlaying) {
+    if (!this.isPlaying || !this.allowsAction('fruit', fruit)) {
       return;
     }
 
@@ -337,10 +367,11 @@ export class PlayScene extends Phaser.Scene {
     this.drawWorkStage();
     this.squashDough();
     this.workshopMessage.setText(`반죽을 클릭해 과일을 감싸 주세요 (0/${WRAP_CLICKS})`);
+    this.notifyTutorial('fruitAdded');
   }
 
   pressDough() {
-    if (!this.isPlaying) {
+    if (!this.isPlaying || !this.allowsAction('press')) {
       return;
     }
 
@@ -364,6 +395,10 @@ export class PlayScene extends Phaser.Scene {
           ? '반죽을 다 밀었어요! 과일 그림을 클릭하세요'
           : `반죽을 밀고 있어요 (${this.maker.rollCount}/${ROLL_CLICKS})`,
       );
+
+      if (this.maker.step === 'rolled') {
+        this.notifyTutorial('rolled');
+      }
       return;
     }
 
@@ -512,7 +547,9 @@ export class PlayScene extends Phaser.Scene {
       },
     });
 
-    if (this.salesCount >= GOAL_SALES) {
+    this.notifyTutorial('sold');
+
+    if (!this.isTutorial && this.salesCount >= GOAL_SALES) {
       this.popText(this.salesText);
       this.finishGame(
         `목표 ${GOAL_SALES}개 달성!`,

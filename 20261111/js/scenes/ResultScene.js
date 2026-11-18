@@ -30,7 +30,7 @@ export class ResultScene extends Phaser.Scene {
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     retryButton.on('pointerdown', () => {
-      this.scene.start('PlayScene');
+      this.scene.start('PlayScene', { tutorial: false });
     });
   }
 }
