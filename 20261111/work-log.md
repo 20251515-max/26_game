@@ -7,3 +7,7 @@
 2026-11-18 15:58 / 시작 화면 디자인 적용 / js/scenes/StartScene.js, prompt.txt, work-log.md / 디자인 가이드의 파스텔 팔레트·둥근 카툰 모찌·입체 버튼을 시작 장면에만 적용해 기존 화면 전환을 유지함
 2026-11-18 16:17 / 플레이 화면 시각 스타일 적용 / js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 첨부 목업의 구성은 사용하지 않고 색감·패널·입체 버튼 언어만 적용해 기존 주문 생성과 결과 이동을 유지함
 2026-11-18 16:17 / 시작 버튼 클릭 영역 수정 / js/scenes/StartScene.js, prompt.txt, work-log.md / 글자 픽셀에만 한정된 클릭 판정을 보이는 버튼 전체 영역으로 확장해 장면 전환을 복구함
+2026-11-18 16:22 / 주문 모찌 과일별 색상 적용 / js/orders/Order.js, js/scenes/PlayScene.js, prompt.txt, work-log.md / 주문 이름과 색상을 같은 주문 모듈에서 연결해 과일 종류마다 주문 카드 모찌 색이 달라지게 함
+2026-11-18 16:24 / 주문 모찌 과일별 일러스트 적용 / js/scenes/PlayScene.js, prompt.txt, work-log.md / 이미지 파일 없이 과일 고유의 씨·알갱이·잎·과육 형태를 코드로 그려 주문 종류를 시각적으로 구분함
+2026-11-18 16:27 / 조합형 모찌 제작 조작 추가 / js/production/MochiMaker.js, js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 찹쌀 반죽을 먼저 선택하고 과일 재료를 선택해야 모찌가 완성되도록 제작 규칙과 화면 조작을 분리해 구현함
+2026-11-18 16:34 / MVP 규칙 상수 확정 및 초기 시간·주문 정보 표시 / js/config/GameRules.js, js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 사용자가 고른 시간·과일별 금액·단계별 확장 비용·판매 개수 목표를 한 규칙 모듈에 모아 이후 판매·타이머·확장 작업이 같은 값을 쓰게 함

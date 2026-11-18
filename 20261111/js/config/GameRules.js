@@ -1,0 +1,19 @@
+// MVP 규칙 상수
+// 모찌 종류: 딸기·포도·복숭아·망고 (orders/Order.js의 FRUIT_MOCHI_TYPES)
+// 주문 표현: 손님 주문 카드에 모찌 한 개를 그림과 이름으로 표시
+// 제작 조작: 찹쌀 반죽 버튼 → 과일 버튼 순서로 눌러 모찌 완성
+
+export const TIME_LIMIT_SECONDS = 60;
+
+export const MOCHI_PRICES = {
+  '딸기 모찌': 1000,
+  '포도 모찌': 1200,
+  '복숭아 모찌': 1500,
+  '망고 모찌': 2000,
+};
+
+// 단계별 확장 비용 (최대 3단계)
+export const EXPANSION_COSTS = [3000, 5000, 8000];
+
+// 성공 조건: 제한 시간 안에 모찌를 목표 개수만큼 판매
+export const GOAL_SALES = 10;
