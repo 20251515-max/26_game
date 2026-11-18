@@ -15,3 +15,4 @@
 2026-11-18 16:42 / 제한 시간 감소와 시간 종료 실패 처리 / js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 1초 반복 타이머로 남은 시간을 갱신하고, 0초가 되면 제작 입력을 막은 뒤 실패 결과 화면으로 이동하게 함
 2026-11-18 16:43 / 목표 판매 달성 시 성공 처리 / js/scenes/PlayScene.js, tasks.md, prompt.txt, work-log.md / 시간 종료와 같은 종료 함수를 공유해 목표 개수 판매 즉시 입력·타이머를 멈추고 성공 결과로 이동하게 함
 2026-11-18 16:48 / 그림 클릭과 밀기·감싸기 단계로 제작 방식 변경 / js/production/MochiMaker.js, js/scenes/PlayScene.js, js/ui/CuteShapes.js, js/config/GameRules.js, prompt.txt, work-log.md / 사용자가 고른 클릭 방식으로 반죽 올리기→3번 밀기→과일 올리기→3번 감싸기 단계를 제작 모듈에 두고, 단계가 늘어난 만큼 제한 시간을 90초로 늘림
+2026-11-18 16:54 / 시작 화면 연습하기 버튼과 튜토리얼 연습 모드 추가 / js/tutorial/TutorialGuide.js, js/scenes/PlayScene.js, js/scenes/StartScene.js, js/scenes/ResultScene.js, spec.md, tasks.md, prompt.txt, work-log.md / 플레이 화면을 그대로 재사용하고 안내 단계별로 허용 조작을 제한해 실제 조작을 따라 하며 배우도록 하고, 안내 모듈은 별도 파일로 분리함
