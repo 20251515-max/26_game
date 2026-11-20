@@ -135,6 +135,33 @@ export function drawRollingPin(graphics) {
   graphics.fillRoundedRect(-70, -8, 80, 5, 2.5);
 }
 
+export function drawCuttingBoard(graphics) {
+  graphics.fillStyle(0xb9e2b9, 1);
+  graphics.fillRoundedRect(-150, -54, 300, 124, 26);
+  graphics.fillStyle(0xddf3dd, 1);
+  graphics.fillRoundedRect(-150, -62, 300, 124, 26);
+  graphics.lineStyle(4, OUTLINE_COLOR, 1);
+  graphics.strokeRoundedRect(-150, -62, 300, 124, 26);
+  graphics.fillStyle(0xfff9ee, 1);
+  graphics.fillCircle(124, -36, 8);
+  graphics.lineStyle(3, OUTLINE_COLOR, 1);
+  graphics.strokeCircle(124, -36, 8);
+}
+
+// 칼날 끝이 (0, 0)에 오도록 그린다.
+export function drawKnife(graphics) {
+  graphics.fillStyle(0xb97c55, 1);
+  graphics.fillRoundedRect(-8, -72, 16, 30, 7);
+  graphics.lineStyle(3, OUTLINE_COLOR, 1);
+  graphics.strokeRoundedRect(-8, -72, 16, 30, 7);
+  graphics.fillStyle(0xeef3fa, 1);
+  graphics.fillRoundedRect(-13, -44, 26, 46, 11);
+  graphics.lineStyle(3, OUTLINE_COLOR, 1);
+  graphics.strokeRoundedRect(-13, -44, 26, 46, 11);
+  graphics.fillStyle(0xffffff, 1);
+  graphics.fillRoundedRect(-7, -38, 5, 28, 2.5);
+}
+
 export function drawHeart(graphics, size, color) {
   const r = size * 0.3;
 

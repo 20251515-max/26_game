@@ -108,6 +108,18 @@ const SOUNDS = {
   },
   // 주문과 다른 모찌: 부드러운 "뿌잉"
   wrong: (context) => tone(context, { type: 'triangle', from: 500, to: 240, duration: 0.3, volume: 0.3 }),
+  // 과일 씻기: 물방울 "보글"
+  wash: (context) => {
+    noise(context, { frequency: vary(1800, 0.15), duration: 0.15, volume: 0.18 });
+    tone(context, { from: vary(900), to: vary(1400), delay: 0.03, duration: 0.07, volume: 0.15 });
+  },
+  // 과일 자르기: 짧은 "싹"
+  cut: (context) => {
+    noise(context, { frequency: vary(4000, 0.1), duration: 0.07, volume: 0.25 });
+    tone(context, { type: 'triangle', from: 260, to: 160, delay: 0.05, duration: 0.06, volume: 0.25 });
+  },
+  // 손질 완료: 경쾌한 "띠링"
+  prepDone: (context) => melody(context, [784, 1047], { type: 'sine', step: 0.08, duration: 0.22, volume: 0.25 }),
   // 남은 10초: 급한 "똑딱"
   tick: (context) => tone(context, { type: 'square', from: 1000, duration: 0.04, volume: 0.08 }),
   // 성공: 짧은 팡파르

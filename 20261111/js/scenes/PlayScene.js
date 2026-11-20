@@ -1,6 +1,8 @@
 import { GOAL_SALES, MOCHI_PRICES, TIME_LIMIT_SECONDS } from '../config/GameRules.js';
 import { createInitialOrder, createNextOrder, getMochiColor } from '../orders/Order.js';
 import { FRUIT_INGREDIENTS, MochiMaker, ROLL_CLICKS, WRAP_CLICKS } from '../production/MochiMaker.js';
+import { CUT_CLICKS, FruitPrep, PIECES_PER_PREP, WASH_CLICKS } from '../production/FruitPrep.js';
+import { PrepStation } from '../ui/PrepStation.js';
 import {
   FRUIT_COLORS,
   drawCustomer,
@@ -35,6 +37,11 @@ export class PlayScene extends Phaser.Scene {
     const background = this.add.graphics();
 
     this.maker = new MochiMaker();
+    this.prep = new FruitPrep();
+    this.phase = 'idle';
+    this.order = null;
+    // 장면 객체는 재시작해도 그대로 쓰이므로 이전 판의 타이머를 지운다.
+    this.countdown = null;
     this.money = 0;
     this.salesCount = 0;
 
@@ -75,24 +82,123 @@ export class PlayScene extends Phaser.Scene {
       this.createButton(870, 600, 220, 60, 0x8fd48a, '실전 시작', () => {
         this.scene.start('PlayScene', { tutorial: false });
       });
-      this.showOrder(TUTORIAL_ORDER);
       this.tutorial = new TutorialGuide(this);
+    } else {
+      this.tutorial = null;
+      this.createButton(870, 600, 220, 60, 0xffa9c0, '결과 화면 보기', () => {
+        this.scene.start('ResultScene', { message: '이번 판이 끝났습니다.' });
+      });
+      // 제한 시간은 손님이 있을 때만 흐른다.
+      this.countdown = this.time.addEvent({
+        delay: 1000,
+        loop: true,
+        paused: true,
+        callback: () => this.tickTime(),
+      });
+    }
+
+    this.enterIdle(true);
+
+    if (this.tutorial) {
       this.tutorial.start();
+    }
+  }
+
+  get orderFruit() {
+    return this.order.replace(' 모찌', '');
+  }
+
+  // 손님이 없는 상태: 시간이 멈추고 과일을 손질할 수 있다.
+  enterIdle(isStart) {
+    const idleMessage = isStart
+      ? '손님이 오기 전이에요. 과일 그림을 클릭해 손질해 두세요'
+      : '손님이 없어요. 과일을 손질하거나 손님을 받으세요';
+
+    this.phase = 'idle';
+    this.pinGraphics.setVisible(false);
+    this.updateTileStates();
+
+    if (this.countdown) {
+      this.countdown.paused = true;
+      this.timeText.setAlpha(0.5);
+    }
+
+    if (isStart) {
+      this.showPrepStation(true);
+      this.showEmptyOrder();
+      this.workshopMessage.setText(idleMessage);
       return;
     }
 
-    this.tutorial = null;
-    this.createButton(870, 600, 220, 60, 0xffa9c0, '결과 화면 보기', () => {
-      this.scene.start('ResultScene', { message: '이번 판이 끝났습니다.' });
+    // 판매한 모찌가 손님에게 도착한 뒤 손님이 떠난다.
+    this.tweens.add({
+      targets: [this.customerGraphics, this.orderMochiGraphics],
+      scale: 0,
+      duration: 250,
+      delay: 450,
+      ease: 'Back.easeIn',
+      onComplete: () => this.showEmptyOrder(),
     });
-
-    this.showOrder(createInitialOrder());
-
-    this.countdown = this.time.addEvent({
-      delay: 1000,
-      loop: true,
-      callback: () => this.tickTime(),
+    this.time.delayedCall(900, () => {
+      if (this.phase === 'idle' && this.isPlaying && !this.prep.isBusy) {
+        this.showPrepStation(true);
+        this.workshopMessage.setText(idleMessage);
+      }
     });
+  }
+
+  showEmptyOrder() {
+    this.customerGraphics.clear();
+    this.orderMochiGraphics.clear().setScale(1);
+    this.orderMochiGraphics.fillStyle(0x5a466b, 0.35);
+    [-24, 0, 24].forEach((dx) => this.orderMochiGraphics.fillCircle(dx, 0, 8));
+    this.orderNameText.setText('손님 없음');
+    this.orderPriceText.setVisible(false);
+    this.callButton.setVisible(true);
+  }
+
+  // [손님 받기]: 새 주문을 받고 시간이 다시 흐른다.
+  callCustomer() {
+    if (!this.isPlaying || this.phase !== 'idle' || !this.allowsAction('call')) {
+      return;
+    }
+
+    if (this.prep.isBusy) {
+      this.workshopMessage.setText('도마의 과일 손질을 먼저 끝내세요');
+      playSound(this, 'error');
+      return;
+    }
+
+    let order;
+
+    if (this.isTutorial && this.salesCount === 0) {
+      order = TUTORIAL_ORDER;
+    } else {
+      order = this.order ? createNextOrder(this.order) : createInitialOrder();
+    }
+
+    this.phase = 'serving';
+    this.callButton.setVisible(false);
+    this.orderPriceText.setVisible(true);
+    this.showOrder(order);
+    playSound(this, 'customer');
+    this.showPrepStation(false);
+    this.resetWorkGraphics();
+    this.updateTileStates();
+
+    if (this.countdown) {
+      this.countdown.paused = false;
+      this.timeText.setAlpha(1);
+    }
+
+    const fruit = this.orderFruit;
+
+    this.workshopMessage.setText(
+      this.prep.hasStock(fruit)
+        ? '어서 오세요! 반죽 그림을 클릭해 작업대에 올리세요'
+        : `손질된 ${fruit}가 없어요! ${fruit} 그림을 눌러 급히 손질하세요`,
+    );
+    this.notifyTutorial('customerCalled');
   }
 
   tickTime() {
@@ -210,11 +316,12 @@ export class PlayScene extends Phaser.Scene {
       fontSize: '26px',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    this.salesText = this.add.text(210, 530, `목표 판매 0 / ${GOAL_SALES}개`, {
+    this.salesText = this.add.text(210, 540, `목표 판매 0 / ${GOAL_SALES}개`, {
       color: '#5a466b',
       fontFamily: 'sans-serif',
       fontSize: '21px',
     }).setOrigin(0.5);
+    this.callButton = this.createButton(100, 462, 220, 48, 0x8fd48a, '손님 받기', () => this.callCustomer());
   }
 
   showOrder(order) {
@@ -266,15 +373,16 @@ export class PlayScene extends Phaser.Scene {
     this.workGraphics = this.add.graphics({ x: BOARD_X, y: BOARD_Y });
     this.pinGraphics = this.add.graphics({ x: BOARD_X, y: PIN_REST_Y }).setVisible(false);
     drawRollingPin(this.pinGraphics);
+    this.prepStation = new PrepStation(this, BOARD_X, BOARD_Y);
 
-    this.workshopMessage = this.add.text(817, 425, '반죽 그림을 클릭해 작업대에 올리세요', {
+    this.workshopMessage = this.add.text(817, 425, '', {
       color: '#5a466b',
       fontFamily: 'sans-serif',
       fontSize: '20px',
     }).setOrigin(0.5);
 
     const board = this.add.zone(817, 312, 595, 172).setInteractive({ useHandCursor: true });
-    board.on('pointerdown', () => this.pressDough());
+    board.on('pointerdown', () => this.onBoardClick());
   }
 
   createIngredientTray(graphics) {
@@ -283,18 +391,38 @@ export class PlayScene extends Phaser.Scene {
     graphics.lineStyle(4, 0x5a466b, 1);
     graphics.strokeRoundedRect(445, 452, 745, 102, 26);
 
-    this.createIngredientTile(537, '찹쌀 반죽', (icon) => drawDough(icon, 0, 0, 52, 42), () => {
+    this.doughTile = this.createIngredientTile(537, '찹쌀 반죽', (icon) => drawDough(icon, 0, 0, 52, 42), () => {
       this.placeDough();
     });
 
+    this.fruitTiles = {};
     FRUIT_INGREDIENTS.forEach((fruit, index) => {
-      this.createIngredientTile(677 + index * 140, fruit, (icon) => drawFruitIcon(icon, fruit, 0, 0, 20), () => {
-        this.addFruit(fruit);
-      });
+      this.fruitTiles[fruit] = this.createIngredientTile(
+        677 + index * 140,
+        fruit,
+        (icon) => drawFruitIcon(icon, fruit, 0, 0, 20),
+        () => this.onFruitTile(fruit),
+        true,
+      );
     });
   }
 
-  createIngredientTile(x, label, drawIcon, onClick) {
+  // 재료 칸: 손님이 없으면 반죽 칸을 흐리게, 손님이 있을 때 손질된 과일이 없으면 과일 칸을 흐리게 한다.
+  updateTileStates() {
+    this.doughTile.container.setAlpha(this.phase === 'serving' ? 1 : 0.45);
+    FRUIT_INGREDIENTS.forEach((fruit) => {
+      const tile = this.fruitTiles[fruit];
+
+      tile.badge.setText(String(this.prep.stock[fruit]));
+      tile.container.setAlpha(this.phase === 'serving' && !this.prep.hasStock(fruit) ? 0.55 : 1);
+    });
+  }
+
+  popTile(container) {
+    this.tweens.add({ targets: container, scale: 1.15, duration: 100, yoyo: true });
+  }
+
+  createIngredientTile(x, label, drawIcon, onClick, withBadge = false) {
     const tile = this.add.graphics();
     const icon = this.add.graphics({ x: 0, y: -10 });
     const text = this.add.text(0, 26, label, {
@@ -310,7 +438,27 @@ export class PlayScene extends Phaser.Scene {
     tile.strokeRoundedRect(-55, -42, 110, 84, 22);
     drawIcon(icon);
 
-    const container = this.add.container(x, 503, [tile, icon, text]);
+    const parts = [tile, icon, text];
+    let badge = null;
+
+    // 손질된 과일 개수
+    if (withBadge) {
+      const badgeCircle = this.add.graphics();
+
+      badgeCircle.fillStyle(0xffa9c0, 1);
+      badgeCircle.fillCircle(42, -32, 15);
+      badgeCircle.lineStyle(3, 0x5a466b, 1);
+      badgeCircle.strokeCircle(42, -32, 15);
+      badge = this.add.text(42, -32, '0', {
+        color: '#ffffff',
+        fontFamily: 'sans-serif',
+        fontSize: '17px',
+        fontStyle: 'bold',
+      }).setOrigin(0.5);
+      parts.push(badgeCircle, badge);
+    }
+
+    const container = this.add.container(x, 503, parts);
     const zone = this.add.zone(x, 503, 110, 84).setInteractive({ useHandCursor: true });
 
     zone.on('pointerover', () => container.setScale(1.06));
@@ -319,6 +467,135 @@ export class PlayScene extends Phaser.Scene {
       this.tweens.add({ targets: container, scale: 0.92, duration: 70, yoyo: true });
       onClick();
     });
+
+    return { container, badge };
+  }
+
+  onBoardClick() {
+    if (!this.isPlaying) {
+      return;
+    }
+
+    if (this.prep.isBusy) {
+      this.pressPrep();
+      return;
+    }
+
+    if (this.phase === 'idle') {
+      if (this.allowsAction('prepPress')) {
+        this.workshopMessage.setText('과일 그림을 클릭해 손질을 시작하세요');
+        playSound(this, 'error');
+      }
+      return;
+    }
+
+    this.pressDough();
+  }
+
+  onFruitTile(fruit) {
+    if (!this.isPlaying) {
+      return;
+    }
+
+    if (this.phase === 'idle') {
+      this.startPrep(fruit);
+      return;
+    }
+
+    if (this.prep.isBusy) {
+      this.workshopMessage.setText('도마의 과일 손질을 먼저 끝내세요');
+      playSound(this, 'error');
+      return;
+    }
+
+    if (!this.prep.hasStock(fruit)) {
+      // 주문한 과일이 다 떨어졌을 때만 손님이 있어도 급히 손질할 수 있다.
+      if (fruit === this.orderFruit) {
+        this.startPrep(fruit);
+        return;
+      }
+
+      this.workshopMessage.setText(`손질된 ${fruit}가 없어요. 손님이 없을 때 손질하세요`);
+      playSound(this, 'error');
+      return;
+    }
+
+    this.addFruit(fruit);
+  }
+
+  // 도마를 보이면 반죽 작업은 잠시 숨긴다.
+  showPrepStation(visible) {
+    this.prepStation.setVisible(visible);
+    this.workGraphics.setVisible(!visible);
+    this.pinGraphics.setVisible(!visible && this.maker.step === 'dough');
+  }
+
+  startPrep(fruit) {
+    if (!this.allowsAction('prepStart', fruit)) {
+      return;
+    }
+
+    if (!this.prep.start(fruit)) {
+      this.workshopMessage.setText('도마의 과일 손질을 먼저 끝내세요');
+      playSound(this, 'error');
+      return;
+    }
+
+    this.showPrepStation(true);
+    this.prepStation.draw(this.prep);
+    this.prepStation.popIn();
+    playSound(this, 'fruit');
+    this.workshopMessage.setText(`${fruit}를 클릭해 씻어 주세요 (0/${WASH_CLICKS})`);
+    this.notifyTutorial('prepStarted');
+  }
+
+  pressPrep() {
+    if (!this.allowsAction('prepPress')) {
+      return;
+    }
+
+    const result = this.prep.press();
+
+    this.prepStation.draw(this.prep);
+
+    if (result.action === 'wash') {
+      this.prepStation.splash();
+      playSound(this, 'wash');
+
+      if (this.prep.step === 'cut') {
+        this.workshopMessage.setText(`깨끗해졌어요! 클릭해 잘라 주세요 (0/${CUT_CLICKS})`);
+        this.notifyTutorial('washed');
+      } else {
+        this.workshopMessage.setText(`씻는 중 (${this.prep.washCount}/${WASH_CLICKS})`);
+      }
+      return;
+    }
+
+    if (result.action === 'cut') {
+      this.prepStation.chop();
+      playSound(this, 'cut');
+      this.workshopMessage.setText(`자르는 중 (${this.prep.cutCount}/${CUT_CLICKS})`);
+      return;
+    }
+
+    const tile = this.fruitTiles[result.fruit].container;
+
+    playSound(this, 'cut');
+    this.time.delayedCall(150, () => playSound(this, 'prepDone'));
+    this.updateTileStates();
+    this.prepStation.sendPieces(result.fruit, tile.x, tile.y - 10, () => this.popTile(tile));
+    this.workshopMessage.setText(`손질된 ${result.fruit} +${PIECES_PER_PREP}개!`);
+    this.notifyTutorial('prepDone');
+
+    // 급한 손질이 끝나면 다시 모찌 작업대로 돌아간다.
+    if (this.phase === 'serving') {
+      this.time.delayedCall(500, () => {
+        if (this.phase === 'serving' && !this.prep.isBusy) {
+          this.showPrepStation(false);
+          this.workshopMessage.setText('손질 끝! 이어서 모찌를 만들어요');
+        }
+      });
+    }
   }
 
   // 연습 안내 중에는 지금 단계에서 허용한 조작만 할 수 있다.
@@ -334,6 +611,18 @@ export class PlayScene extends Phaser.Scene {
 
   placeDough() {
     if (!this.isPlaying || !this.allowsAction('dough')) {
+      return;
+    }
+
+    if (this.phase !== 'serving') {
+      this.workshopMessage.setText('손님이 오면 모찌를 만들 수 있어요');
+      playSound(this, 'error');
+      return;
+    }
+
+    if (this.prep.isBusy) {
+      this.workshopMessage.setText('도마의 과일 손질을 먼저 끝내세요');
+      playSound(this, 'error');
       return;
     }
 
@@ -370,6 +659,8 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
 
+    this.prep.useStock(fruit);
+    this.updateTileStates();
     this.drawWorkStage();
     this.squashDough();
     this.workshopMessage.setText(`반죽을 클릭해 과일을 감싸 주세요 (0/${WRAP_CLICKS})`);
@@ -573,8 +864,7 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
 
-    this.time.delayedCall(500, () => playSound(this, 'customer'));
-    this.showOrder(createNextOrder(this.order));
+    this.enterIdle(false);
   }
 
   popText(text) {
@@ -674,6 +964,19 @@ export class PlayScene extends Phaser.Scene {
     button.on('pointerout', () => {
       face.y = y;
     });
+
+    return {
+      setVisible: (visible) => {
+        shadow.setVisible(visible);
+        face.setVisible(visible);
+
+        if (visible) {
+          button.setInteractive();
+        } else {
+          button.disableInteractive();
+        }
+      },
+    };
   }
 
   drawPanel(graphics, x, y, width, height, color, radius) {

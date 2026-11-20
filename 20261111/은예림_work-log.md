@@ -19,3 +19,5 @@
 2026-11-18 17:04 / 추천 효과음(●·◐) 추가 / js/audio/SoundEffects.js, js/scenes/PlayScene.js, js/scenes/StartScene.js, js/scenes/ResultScene.js, js/tutorial/TutorialGuide.js, prompt.txt, work-log.md / 소리 파일이 없어 Web Audio로 효과음을 합성하고, 잦은 밀기·감싸기 소리는 작고 짧게 높낮이를 흔들며 겹치는 소리는 시간차를 둠
 2026-11-18 17:06 / 20261111 폴더를 최상위로 하는 새 GitHub 저장소 업로드 방법 안내 / prompt.txt, work-log.md / CLAUDE.md의 git 직접 실행 금지 규칙에 따라 명령은 실행하지 않고, 기존 저장소를 건드리지 않는 subtree split 절차를 정리함
 2026-11-18 17:08 / 20261111 폴더 단독 GitHub 저장소용 커밋·브랜치 분리 진행, 흩어진 기록 파일을 은예림_ 파일로 합침 / 은예림_prompt.txt, 은예림_work-log.md / 제출용으로 바뀐 파일 이름에 맞춰 기록을 한곳에 모음
+2026-11-18 17:14 / 20261111 폴더를 최상위로 한 새 GitHub 저장소에 업로드 / (코드 변경 없음) 은예림_prompt.txt, 은예림_work-log.md / subtree split으로 20261111의 커밋 기록 14개를 유지한 채 새 저장소 main에 push함
+2026-11-20 14:30 / 손님 공백과 과일 손질(씻기→자르기) 추가, 손님이 있을 때만 시간이 흐르게 변경 / js/production/FruitPrep.js, js/ui/PrepStation.js, js/scenes/PlayScene.js, js/tutorial/TutorialGuide.js, js/ui/CuteShapes.js, js/audio/SoundEffects.js, js/config/GameRules.js, 은예림_spec.md, 은예림_tasks.md, 은예림_prompt.txt, 은예림_work-log.md / 사용자가 고른 손님 받기 버튼·손님 없을 때만 손질·공통 손질 과정을 따르되, 주문 과일 재고가 0이면 진행이 막히므로 그때만 급한 손질을 허용함

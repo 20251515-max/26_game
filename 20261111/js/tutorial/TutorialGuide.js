@@ -1,6 +1,7 @@
 import { GOAL_SALES, TIME_LIMIT_SECONDS } from '../config/GameRules.js';
 import { playSound } from '../audio/SoundEffects.js';
 import { ROLL_CLICKS, WRAP_CLICKS } from '../production/MochiMaker.js';
+import { CUT_CLICKS, PIECES_PER_PREP, WASH_CLICKS } from '../production/FruitPrep.js';
 
 export const TUTORIAL_ORDER = '딸기 모찌';
 const TUTORIAL_FRUIT = '딸기';
@@ -11,6 +12,39 @@ const DEPTH = 50;
 // allow: 이 단계에서 허용하는 조작
 // arrow: 화살표 끝 위치와 가리키는 방향
 const STEPS = [
+  {
+    text: '손님이 오기 전에는 시간이 멈춰 있어요.\n이때 과일을 손질해 두면 주문을 빨리 만들 수 있어요.',
+    target: [606, 452, 580, 102],
+    arrow: [817, 558, 'up'],
+  },
+  {
+    text: `손질할 ${TUTORIAL_FRUIT} 그림을 클릭해 도마에 올려요.`,
+    target: [616, 455, 122, 96],
+    arrow: [677, 558, 'up'],
+    allow: 'prepStart',
+    waitFor: 'prepStarted',
+  },
+  {
+    text: `도마의 ${TUTORIAL_FRUIT}를 ${WASH_CLICKS}번 클릭해 깨끗이 씻어요.`,
+    target: [515, 227, 605, 182],
+    arrow: [950, 307, 'left'],
+    allow: 'prepPress',
+    waitFor: 'washed',
+  },
+  {
+    text: `이번엔 ${CUT_CLICKS}번 클릭해 잘라요.\n손질된 ${TUTORIAL_FRUIT} ${PIECES_PER_PREP}개가 생겨요!`,
+    target: [515, 227, 605, 182],
+    arrow: [950, 307, 'left'],
+    allow: 'prepPress',
+    waitFor: 'prepDone',
+  },
+  {
+    text: '과일 칸의 분홍 숫자가 손질된 과일 개수예요.\n준비됐으면 [손님 받기]를 눌러요!',
+    target: [92, 454, 236, 72],
+    arrow: [332, 486, 'left'],
+    allow: 'call',
+    waitFor: 'customerCalled',
+  },
   {
     text: `손님이 원하는 모찌가 여기에 나와요.\n지금 손님은 ${TUTORIAL_ORDER}를 원해요!`,
     target: [48, 158, 324, 414],
@@ -50,9 +84,14 @@ const STEPS = [
     arrow: [1115, 136, 'up'],
   },
   {
-    text: `실전에서는 ${TIME_LIMIT_SECONDS}초 안에 모찌 ${GOAL_SALES}개를 팔면 성공!\n시간이 끝나면 실패예요. 남은 시간은 오른쪽 위에 보여요.`,
-    target: [75, 508, 270, 44],
-    arrow: [352, 530, 'left'],
+    text: `실전에서는 손님이 있을 때만 시간이 흘러요.\n${TIME_LIMIT_SECONDS}초 안에 모찌 ${GOAL_SALES}개를 팔면 성공!`,
+    target: [75, 518, 270, 44],
+    arrow: [352, 540, 'left'],
+  },
+  {
+    text: '손님이 떠나면 다시 시간이 멈춰요.\n과일을 넉넉히 손질해 두고 손님을 받아요!',
+    target: [606, 452, 580, 102],
+    arrow: [817, 558, 'up'],
   },
   {
     text: '이제 안내 없이 자유롭게 연습해 보세요.\n준비되면 [실전 시작]을 눌러요!',
@@ -93,12 +132,18 @@ export class TutorialGuide {
       return true;
     }
 
-    if (this.step.allow === action && (action !== 'fruit' || fruit === TUTORIAL_FRUIT)) {
+    const needsFruit = action === 'fruit' || action === 'prepStart';
+
+    if (this.step.allow === action && (!needsFruit || fruit === TUTORIAL_FRUIT)) {
       return true;
     }
 
     if (this.step.allow === 'fruit' && action === 'fruit') {
       this.scene.workshopMessage.setText(`주문은 ${TUTORIAL_ORDER}예요. ${TUTORIAL_FRUIT}를 골라 주세요`);
+    }
+
+    if (this.step.allow === 'prepStart' && action === 'prepStart') {
+      this.scene.workshopMessage.setText(`이번엔 ${TUTORIAL_FRUIT}를 손질해 봐요`);
     }
 
     playSound(this.scene, 'error');
@@ -137,7 +182,7 @@ export class TutorialGuide {
     this.isDone = true;
     this.scene.tweens.killTweensOf([this.highlight, this.arrow]);
     [this.panel, this.nextZone, this.highlight, this.arrow].forEach((item) => item.destroy());
-    this.scene.workshopMessage.setText('자유 연습! 반죽 그림부터 클릭하세요');
+    this.scene.workshopMessage.setText('자유 연습! 과일을 손질하고 손님을 받아 보세요');
   }
 
   createPanel() {
