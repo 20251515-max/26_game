@@ -123,6 +123,8 @@ const SOUNDS = {
   // 남은 10초: 급한 "똑딱"
   tick: (context) => tone(context, { type: 'square', from: 1000, duration: 0.04, volume: 0.08 }),
   // 성공: 짧은 팡파르
+  expand: (context) => melody(context, [659, 880, 1175], { type: 'triangle', step: 0.09, duration: 0.25, volume: 0.25 }),
+
   success: (context) => melody(context, [523, 659, 784, 1047], { step: 0.12, duration: 0.3, volume: 0.3 }),
   // 실패: 아쉽게 내려가는 멜로디
   fail: (context) => melody(context, [523, 440, 349], { step: 0.18, duration: 0.35, volume: 0.3 }),

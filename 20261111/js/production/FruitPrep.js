@@ -68,6 +68,10 @@ export class FruitPrep {
     return this.stock[fruit] > 0;
   }
 
+  hasAnyStock() {
+    return FRUIT_INGREDIENTS.some((fruit) => this.hasStock(fruit));
+  }
+
   useStock(fruit) {
     if (!this.hasStock(fruit)) {
       return false;

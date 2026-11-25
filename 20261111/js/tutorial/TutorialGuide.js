@@ -1,4 +1,4 @@
-import { GOAL_SALES, TIME_LIMIT_SECONDS } from '../config/GameRules.js';
+import { GOAL_SALES, PREP_GOAL_PIECES, PREP_TIME_SECONDS, TIME_LIMIT_SECONDS } from '../config/GameRules.js';
 import { playSound } from '../audio/SoundEffects.js';
 import { ROLL_CLICKS, WRAP_CLICKS } from '../production/MochiMaker.js';
 import { CUT_CLICKS, PIECES_PER_PREP, WASH_CLICKS } from '../production/FruitPrep.js';
@@ -13,7 +13,7 @@ const DEPTH = 50;
 // arrow: 화살표 끝 위치와 가리키는 방향
 const STEPS = [
   {
-    text: '손님이 오기 전에는 시간이 멈춰 있어요.\n이때 과일을 손질해 두면 주문을 빨리 만들 수 있어요.',
+    text: '먼저 손님이 오기 전에 과일을 손질해 둬요.\n영업이 시작되면 손질할 수 없어요!',
     target: [606, 452, 580, 102],
     arrow: [817, 558, 'up'],
   },
@@ -39,7 +39,7 @@ const STEPS = [
     waitFor: 'prepDone',
   },
   {
-    text: '과일 칸의 분홍 숫자가 손질된 과일 개수예요.\n준비됐으면 [손님 받기]를 눌러요!',
+    text: '과일 칸의 분홍 숫자가 손질된 과일 개수예요.\n준비됐으면 [영업 시작]을 눌러요!',
     target: [92, 454, 236, 72],
     arrow: [332, 486, 'left'],
     allow: 'call',
@@ -84,17 +84,22 @@ const STEPS = [
     arrow: [1115, 136, 'up'],
   },
   {
-    text: `실전에서는 손님이 있을 때만 시간이 흘러요.\n${TIME_LIMIT_SECONDS}초 안에 모찌 ${GOAL_SALES}개를 팔면 성공!`,
+    text: `실전 1단계는 손질 시간이에요.\n${PREP_TIME_SECONDS}초 안에 과일 ${PREP_GOAL_PIECES}개 이상을 손질하지 못하면 실패!`,
+    target: [800, 27, 190, 102],
+    arrow: [895, 136, 'up'],
+  },
+  {
+    text: `2단계는 영업 시간이에요. 손님이 계속 와요.\n${TIME_LIMIT_SECONDS}초 안에 모찌 ${GOAL_SALES}개를 팔면 성공!`,
     target: [75, 518, 270, 44],
     arrow: [352, 540, 'left'],
   },
   {
-    text: '손님이 떠나면 다시 시간이 멈춰요.\n과일을 넉넉히 손질해 두고 손님을 받아요!',
-    target: [606, 452, 580, 102],
-    arrow: [817, 558, 'up'],
+    text: '주문한 과일이 다 떨어지면 [다음 손님]을 눌러\n손님을 넘겨요. 그러니 넉넉히 손질해 둬요!',
+    target: [92, 454, 236, 72],
+    arrow: [332, 486, 'left'],
   },
   {
-    text: '이제 안내 없이 자유롭게 연습해 보세요.\n준비되면 [실전 시작]을 눌러요!',
+    text: '[다음]을 누르면 실전처럼 손질부터 다시 연습해요.\n시간 제한은 없고, 언제든 [실전 시작]을 누를 수 있어요!',
     target: [862, 592, 236, 84],
     arrow: [1104, 630, 'left'],
   },
@@ -182,7 +187,7 @@ export class TutorialGuide {
     this.isDone = true;
     this.scene.tweens.killTweensOf([this.highlight, this.arrow]);
     [this.panel, this.nextZone, this.highlight, this.arrow].forEach((item) => item.destroy());
-    this.scene.workshopMessage.setText('자유 연습! 과일을 손질하고 손님을 받아 보세요');
+    this.scene.startFreePractice();
   }
 
   createPanel() {

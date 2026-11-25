@@ -1,3 +1,5 @@
+import { getMochiColor } from '../orders/Order.js';
+
 const OUTLINE_COLOR = 0x5a466b;
 
 // 모든 도형은 graphics의 (0, 0)을 중심으로 그린다.
@@ -191,4 +193,46 @@ export function drawDrop(graphics, size, color) {
   graphics.fillStyle(color, 1);
   graphics.fillCircle(0, r * 0.4, r);
   graphics.fillTriangle(-r * 0.92, r * 0.05, r * 0.92, r * 0.05, 0, -r * 1.6);
+}
+
+// 과일마다 씨·알갱이·볼·과육 모양이 다른 완성 모찌
+export function drawFruitMochi(graphics, x, y, order) {
+  graphics.fillStyle(getMochiColor(order), 1);
+  graphics.fillCircle(x, y, 48);
+  graphics.lineStyle(4, OUTLINE_COLOR, 1);
+  graphics.strokeCircle(x, y, 48);
+
+  if (order === '딸기 모찌') {
+    graphics.fillStyle(OUTLINE_COLOR, 1);
+    [-17, 0, 17].forEach((seedX) => graphics.fillCircle(x + seedX, y + 10, 3));
+    graphics.fillStyle(0x70b66b, 1);
+    graphics.fillTriangle(x - 20, y - 35, x, y - 56, x + 6, y - 27);
+    graphics.fillTriangle(x - 6, y - 27, x + 18, y - 50, x + 22, y - 24);
+  }
+
+  if (order === '포도 모찌') {
+    graphics.fillStyle(0x8767c3, 1);
+    [[-13, -9], [13, -9], [0, 9], [-13, 18], [13, 18]].forEach(([grapeX, grapeY]) => {
+      graphics.fillCircle(x + grapeX, y + grapeY, 11);
+    });
+    graphics.fillStyle(0x70b66b, 1);
+    graphics.fillTriangle(x - 4, y - 40, x + 14, y - 55, x + 15, y - 30);
+  }
+
+  if (order === '복숭아 모찌') {
+    graphics.fillStyle(0xff8d9e, 1);
+    graphics.fillCircle(x - 17, y + 9, 12);
+    graphics.fillCircle(x + 17, y + 9, 12);
+    graphics.fillStyle(0x70b66b, 1);
+    graphics.fillTriangle(x - 3, y - 41, x + 20, y - 54, x + 13, y - 27);
+  }
+
+  if (order === '망고 모찌') {
+    graphics.fillStyle(0xffb942, 1);
+    graphics.fillEllipse(x, y + 6, 49, 57);
+    graphics.lineStyle(3, 0xe5972d, 1);
+    graphics.strokeEllipse(x, y + 6, 49, 57);
+    graphics.fillStyle(0x70b66b, 1);
+    graphics.fillTriangle(x - 2, y - 37, x + 21, y - 54, x + 13, y - 25);
+  }
 }
