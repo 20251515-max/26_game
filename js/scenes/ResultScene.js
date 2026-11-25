@@ -1,26 +1,44 @@
+import { playSound } from '../audio/SoundEffects.js';
+import { playMusic } from '../audio/BackgroundMusic.js';
+import { createMusicButton } from '../ui/MusicButton.js';
+
 export class ResultScene extends Phaser.Scene {
   constructor() {
-    super("ResultScene");
+    super('ResultScene');
   }
 
-  create(result = {}) {
-    const title = result.success ? "성공" : "결과";
+  init(data) {
+    this.message = data.message;
+  }
 
-    this.add.text(480, 180, title, {
-      color: "#4b2d25",
-      fontFamily: "Malgun Gothic, sans-serif",
-      fontSize: "52px",
-      fontStyle: "bold",
+  create() {
+    this.add.text(640, 245, '결과 화면', {
+      color: '#6b3c28',
+      fontFamily: 'sans-serif',
+      fontSize: '56px',
+      fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    const restartButton = this.add.text(480, 330, "다시 하기", {
-      backgroundColor: "#d67a5c",
-      color: "#ffffff",
-      fontFamily: "Malgun Gothic, sans-serif",
-      fontSize: "28px",
-      padding: { x: 30, y: 16 },
+    this.add.text(640, 340, this.message, {
+      color: '#8b5e47',
+      fontFamily: 'sans-serif',
+      fontSize: '28px',
+    }).setOrigin(0.5);
+
+    const retryButton = this.add.text(640, 475, '다시 하기', {
+      backgroundColor: '#f39a72',
+      color: '#ffffff',
+      fontFamily: 'sans-serif',
+      fontSize: '32px',
+      padding: { x: 36, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-    restartButton.on("pointerup", () => this.scene.start("PlayScene"));
+    retryButton.on('pointerdown', () => {
+      playSound(this, 'button');
+      this.scene.start('PlayScene', { tutorial: false });
+    });
+
+    createMusicButton(this);
+    playMusic(this, 'menu');
   }
 }

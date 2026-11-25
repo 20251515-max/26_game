@@ -29,3 +29,5 @@
 2026-11-25 14:59 / 직접 작곡한 배경 음악과 음악 끄기 버튼 추가, 씻기·자르기·반죽·완성 효과음 강화와 손님 도착 효과음 추가 / js/audio/BackgroundMusic.js, js/audio/SoundEffects.js, js/ui/MusicButton.js, js/scenes/StartScene.js, js/scenes/PlayScene.js, js/scenes/ResultScene.js, 은예림_spec.md, 은예림_tasks.md, 은예림_prompt.txt, 은예림_work-log.md / 소리 파일이 없어 기존처럼 Web Audio로 합성하고, 장면이 바뀌어도 음악과 끄기 설정이 이어지도록 음악 상태를 모듈 하나에 둠
 2026-11-25 15:00 / 소리 작업 확인 (코드 변경 없음) / 은예림_prompt.txt, 은예림_work-log.md / 사용자가 결과에 만족해 추가 수정 없이 기록만 남김
 2026-11-25 16:12 / 원스토어 웹게임 SDK 연동 상태 점검 / 은예림_prompt.txt, 은예림_work-log.md / 엔트리 HTML과 전체 게임 코드를 읽기 전용으로 검사해 SDK 연동 코드 부재와 외부 확인 항목을 구분함
+2026-11-25 16:29 / GitHub Pages 배포용 폴더 구조 점검 / 은예림_prompt.txt, 은예림_work-log.md / 로컬 프로젝트 최상위에 index.html이 있어 현재 작업 폴더 내부 중첩은 원인이 아님을 확인함
+2026-11-25 16:37 / GitHub Pages에서 게임이 보이도록 20261111 폴더 안의 파일을 저장소 맨 위로 꺼냄 / 20261111/* → 맨 위, 예전 index.html·js·prompt.txt·spec.md·tasks.md·work-log.md → _old_version/, 중복 AGENTS.md·기획안 hwpx 삭제, 은예림_prompt.txt, 은예림_work-log.md / Pages는 저장소 맨 위 index.html을 보여 주는데 그 자리에 10월 초기 버전이 있었고, 그 기록은 새 기록에 없는 내용이라 지우지 않고 보관함
