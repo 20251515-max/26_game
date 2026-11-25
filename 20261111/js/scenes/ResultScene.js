@@ -1,4 +1,6 @@
 import { playSound } from '../audio/SoundEffects.js';
+import { playMusic } from '../audio/BackgroundMusic.js';
+import { createMusicButton } from '../ui/MusicButton.js';
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -35,5 +37,8 @@ export class ResultScene extends Phaser.Scene {
       playSound(this, 'button');
       this.scene.start('PlayScene', { tutorial: false });
     });
+
+    createMusicButton(this);
+    playMusic(this, 'menu');
   }
 }

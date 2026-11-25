@@ -46,7 +46,7 @@ function tone(context, { type = 'sine', from, to = from, delay = 0, duration, vo
   oscillator.stop(start + duration + 0.02);
 }
 
-function noise(context, { frequency, delay = 0, duration, volume }) {
+function noise(context, { frequency, delay = 0, duration, volume, filterType = 'bandpass' }) {
   if (!noiseBuffer) {
     noiseBuffer = context.createBuffer(1, context.sampleRate, context.sampleRate);
     const data = noiseBuffer.getChannelData(0);
@@ -62,7 +62,7 @@ function noise(context, { frequency, delay = 0, duration, volume }) {
   const gain = context.createGain();
 
   source.buffer = noiseBuffer;
-  filter.type = 'bandpass';
+  filter.type = filterType;
   filter.frequency.value = frequency;
   filter.Q.value = 1.5;
   envelope(context, gain, start, duration, volume);
@@ -86,8 +86,11 @@ const SOUNDS = {
   error: (context) => tone(context, { type: 'triangle', from: 300, duration: 0.05, volume: 0.15 }),
   // 반죽 놓기: 말랑하게 떨어지는 "퐁"
   doughPlace: (context) => tone(context, { from: 240, to: 480, duration: 0.14, volume: 0.35 }),
-  // 반죽 밀기: 짧고 작은 "드륵"
-  roll: (context) => noise(context, { frequency: vary(500, 0.15), duration: 0.12, volume: 0.25 }),
+  // 반죽 밀기: 묵직하게 굴러가는 "드르륵"
+  roll: (context) => {
+    noise(context, { frequency: vary(420, 0.15), duration: 0.2, volume: 0.5, filterType: 'lowpass' });
+    tone(context, { from: vary(170), to: vary(120), duration: 0.18, volume: 0.35 });
+  },
   // 다 밀었을 때: 올라가는 "띵"
   rollDone: (context) => {
     tone(context, { from: 880, delay: 0.1, duration: 0.25, volume: 0.2 });
@@ -95,12 +98,23 @@ const SOUNDS = {
   },
   // 과일 올리기: 상큼한 "똑"
   fruit: (context) => tone(context, { from: 700, to: 1050, duration: 0.08, volume: 0.3 }),
-  // 반죽 감싸기: 쫀득한 "꾹"
-  wrap: (context) => tone(context, { from: vary(280), to: vary(180), duration: 0.1, volume: 0.25 }),
-  // 모찌 완성: 통통 튀는 "뾰롱"
-  complete: (context) => tone(context, { from: 500, to: 1200, duration: 0.16, volume: 0.3 }),
+  // 반죽 감싸기: 쫀득하게 늘어나는 "뽀잉"
+  wrap: (context) => {
+    tone(context, { from: vary(240), to: vary(460), duration: 0.09, volume: 0.45 });
+    tone(context, { from: vary(460), to: vary(300), delay: 0.08, duration: 0.1, volume: 0.3 });
+  },
+  // 모찌 완성: 반짝이며 올라가는 "뾰로롱"
+  complete: (context) => {
+    melody(context, [1047, 1319, 1568, 2093], { type: 'sine', step: 0.05, duration: 0.18, volume: 0.35 });
+    tone(context, { type: 'triangle', from: 520, to: 1040, duration: 0.12, volume: 0.3 });
+  },
+  // 손님에게 도착: 기분 좋은 "뽀롱!"
+  deliver: (context) => {
+    tone(context, { from: 660, to: 990, duration: 0.1, volume: 0.45 });
+    tone(context, { type: 'triangle', from: 1320, delay: 0.09, duration: 0.25, volume: 0.35 });
+  },
   // 판매 성공: 동전 "짤랑"
-  sell: (context) => melody(context, [1318, 1760], { type: 'square', step: 0.07, duration: 0.18, volume: 0.12 }),
+  sell: (context) => melody(context, [1318, 1760], { type: 'square', step: 0.07, duration: 0.2, volume: 0.2 }),
   // 새 손님: 문 종 "딸랑"
   customer: (context) => {
     tone(context, { from: 1568, duration: 0.35, volume: 0.15 });
@@ -108,15 +122,17 @@ const SOUNDS = {
   },
   // 주문과 다른 모찌: 부드러운 "뿌잉"
   wrong: (context) => tone(context, { type: 'triangle', from: 500, to: 240, duration: 0.3, volume: 0.3 }),
-  // 과일 씻기: 물방울 "보글"
+  // 과일 씻기: 물 끼얹는 소리와 물방울 "보글보글"
   wash: (context) => {
-    noise(context, { frequency: vary(1800, 0.15), duration: 0.15, volume: 0.18 });
-    tone(context, { from: vary(900), to: vary(1400), delay: 0.03, duration: 0.07, volume: 0.15 });
+    noise(context, { frequency: vary(2200, 0.15), duration: 0.25, volume: 0.4 });
+    [0.02, 0.09, 0.16].forEach((delay) => {
+      tone(context, { from: vary(700, 0.15), to: vary(1500, 0.15), delay, duration: 0.06, volume: 0.35 });
+    });
   },
-  // 과일 자르기: 짧은 "싹"
+  // 과일 자르기: 칼질 "싹" + 도마 "탁"
   cut: (context) => {
-    noise(context, { frequency: vary(4000, 0.1), duration: 0.07, volume: 0.25 });
-    tone(context, { type: 'triangle', from: 260, to: 160, delay: 0.05, duration: 0.06, volume: 0.25 });
+    noise(context, { frequency: vary(5000, 0.1), duration: 0.08, volume: 0.45, filterType: 'highpass' });
+    tone(context, { type: 'triangle', from: 220, to: 90, delay: 0.05, duration: 0.09, volume: 0.55 });
   },
   // 손질 완료: 경쾌한 "띠링"
   prepDone: (context) => melody(context, [784, 1047], { type: 'sine', step: 0.08, duration: 0.22, volume: 0.25 }),

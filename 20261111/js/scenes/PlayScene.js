@@ -15,6 +15,8 @@ import { addShopDecor } from '../ui/ShopDecor.js';
 import { createButton, createStatusCard, popText, showFloatingText, textStyle } from '../ui/Widgets.js';
 import { TUTORIAL_ORDER, TutorialGuide } from '../tutorial/TutorialGuide.js';
 import { playSound } from '../audio/SoundEffects.js';
+import { playMusic } from '../audio/BackgroundMusic.js';
+import { createMusicButton } from '../ui/MusicButton.js';
 
 // 플레이 장면: 화면 모듈을 배치하고, 조작에 따라 손질·손님·제작·판매·확장·라운드 흐름을 진행한다.
 // 라운드마다 phase: prep(1단계 손질) → serving(맨 앞 손님 주문 처리 중) ⇄ waiting(다음 손님이 오는 중) → clear(라운드 성공)
@@ -80,6 +82,8 @@ export class PlayScene extends Phaser.Scene {
 
     this.expandButton = createButton(this, 330, 600, 240, 60, 0xb59cf0, '', () => this.expandShop());
     this.updateExpandButton();
+    createMusicButton(this);
+    playMusic(this, 'game');
     this.enterPrep();
 
     if (this.tutorial) {
@@ -703,7 +707,10 @@ export class PlayScene extends Phaser.Scene {
     const slot = this.orderPanel.slotPosition(index);
 
     this.workbench.sendMochi(slot.x, slot.y);
-    this.time.delayedCall(550, () => this.orderPanel.markDone(index));
+    this.time.delayedCall(550, () => {
+      this.orderPanel.markDone(index);
+      playSound(this, 'deliver');
+    });
 
     if (!this.order.isComplete) {
       this.workshopMessage.setText(`${mochi} 완성! 남은 주문 ${this.order.remaining.length}개`);
@@ -723,7 +730,8 @@ export class PlayScene extends Phaser.Scene {
     this.workshopMessage.setText(`주문 완성! 판매 완료 +${price}원`);
     popText(this, this.moneyText);
     showFloatingText(this, 1115, 140, `+${price}원`);
-    this.time.delayedCall(150, () => playSound(this, 'sell'));
+    // 모찌가 손님에게 도착한 뒤 돈 받는 소리가 난다.
+    this.time.delayedCall(700, () => playSound(this, 'sell'));
 
     this.notifyTutorial('sold');
 
