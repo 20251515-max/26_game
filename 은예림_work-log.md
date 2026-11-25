@@ -36,3 +36,5 @@
 2026-11-25 17:01 / 원스토어 웹게임 SDK 연동 상태 확인 / index.html, js/main.js, js/onestore/OneStoreBoot.js, 은예림_prompt.txt, 은예림_work-log.md / 스킬의 목록 A에 따라 현재 코드에 있는 연동 흐름과 원스토어 콘솔·서버에서만 확인할 항목을 구분함
 2026-11-25 17:02 / 원스토어 H5 SDK 미탐지 원인 진단 / index.html, js/onestore/OneStoreBoot.js, 은예림_prompt.txt, 은예림_work-log.md / Phaser 일반 스크립트가 SDK 모듈보다 먼저 실행되어 SDK를 게임 코드보다 먼저 로드해야 하는 조건을 위반한 것을 확인함
 2026-11-25 17:03 / 원스토어 SDK 선행 로드 순서 수정 / index.html, 은예림_prompt.txt, 은예림_work-log.md / SDK 인스턴스를 최상위 head 모듈에서 먼저 만든 뒤 Phaser와 게임 부팅 모듈을 동적으로 불러와 원스토어 감지 시점보다 게임 코드가 앞서지 않게 함
+2026-11-25 17:12 / 출시 정책 명세 추가 / 은예림_spec.md, 은예림_prompt.txt, 은예림_work-log.md / 요청한 GitHub Pages 배포·원스토어 기본 SDK·일반 브라우저 폴백·광고와 결제 제외 조건만 명세 마지막에 기록함
+2026-11-25 17:13 / 출시 명세 기준 원스토어 SDK 기본 연동 검증 / index.html, js/onestore/OneStoreBoot.js, js/main.js, js/audio/BackgroundMusic.js, js/audio/SoundEffects.js, 은예림_prompt.txt, 은예림_work-log.md / 요청한 SDK 선행 로드·일반 브라우저 err 폴백·진행률과 시작 호출·일시정지와 소리 재개가 이미 구현되어 있어 중복 변경 없이 검증함
