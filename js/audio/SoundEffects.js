@@ -1,3 +1,5 @@
+import { isRingerSilent } from './RingerState.js';
+
 // 소리 파일 없이 Web Audio로 효과음을 만든다.
 const MASTER_VOLUME = 0.5;
 
@@ -147,6 +149,10 @@ const SOUNDS = {
 };
 
 export function playSound(scene, name) {
+  if (isRingerSilent()) {
+    return;
+  }
+
   const context = getContext(scene);
 
   if (context) {

@@ -1,3 +1,5 @@
+import { isRingerSilent } from './RingerState.js';
+
 // 소리 파일 없이 Web Audio로 직접 작곡한 밝은 배경 음악을 반복 재생한다.
 // 장면이 바뀌어도 음악과 끄기 설정이 이어지도록 모듈 하나가 상태를 가진다.
 
@@ -65,7 +67,7 @@ function scheduleStep(index, time) {
 
 // 조금 앞의 음까지 미리 예약해, 타이머가 늦어도 박자가 흔들리지 않게 한다.
 function schedule() {
-  if (context.state !== 'running' || muted) {
+  if (context.state !== 'running' || muted || isRingerSilent()) {
     return;
   }
 
@@ -79,7 +81,7 @@ function schedule() {
 }
 
 function applyVolume() {
-  const target = muted ? 0.0001 : LEVELS[level];
+  const target = muted || isRingerSilent() ? 0.0001 : LEVELS[level];
 
   musicGain.gain.cancelScheduledValues(context.currentTime);
   musicGain.gain.setTargetAtTime(target, context.currentTime, 0.1);
@@ -123,4 +125,10 @@ export function toggleMusic() {
   }
 
   return muted;
+}
+
+export function applyRingerState() {
+  if (context) {
+    applyVolume();
+  }
 }

@@ -31,3 +31,8 @@
 2026-11-25 16:12 / 원스토어 웹게임 SDK 연동 상태 점검 / 은예림_prompt.txt, 은예림_work-log.md / 엔트리 HTML과 전체 게임 코드를 읽기 전용으로 검사해 SDK 연동 코드 부재와 외부 확인 항목을 구분함
 2026-11-25 16:29 / GitHub Pages 배포용 폴더 구조 점검 / 은예림_prompt.txt, 은예림_work-log.md / 로컬 프로젝트 최상위에 index.html이 있어 현재 작업 폴더 내부 중첩은 원인이 아님을 확인함
 2026-11-25 16:37 / GitHub Pages에서 게임이 보이도록 20261111 폴더 안의 파일을 저장소 맨 위로 꺼냄 / 20261111/* → 맨 위, 예전 index.html·js·prompt.txt·spec.md·tasks.md·work-log.md → _old_version/, 중복 AGENTS.md·기획안 hwpx 삭제, 은예림_prompt.txt, 은예림_work-log.md / Pages는 저장소 맨 위 index.html을 보여 주는데 그 자리에 10월 초기 버전이 있었고, 그 기록은 새 기록에 없는 내용이라 지우지 않고 보관함
+2026-11-25 16:53 / 원스토어 웹게임 SDK 연동 상태 재점검 (배포 주소 헤더 포함) / 은예림_prompt.txt, 은예림_work-log.md / 스킬의 목록 A로 엔트리 HTML·게임 코드를 읽기 전용 검사하고, 배포 주소는 curl -sI로 프레임 헤더를 확인함
+2026-11-25 16:53 / 원스토어 웹게임 SDK 기본 연동 추가 / index.html, js/main.js, js/onestore/OneStoreBoot.js, 은예림_prompt.txt, 은예림_work-log.md / 공식 CDN SDK를 Phaser 시작 전에 초기화하고, 원스토어 환경이 아니면 기존 게임을 그대로 시작하도록 부팅·생명주기 경로를 분리함
+2026-11-25 17:01 / 원스토어 웹게임 SDK 연동 상태 확인 / index.html, js/main.js, js/onestore/OneStoreBoot.js, 은예림_prompt.txt, 은예림_work-log.md / 스킬의 목록 A에 따라 현재 코드에 있는 연동 흐름과 원스토어 콘솔·서버에서만 확인할 항목을 구분함
+2026-11-25 17:02 / 원스토어 H5 SDK 미탐지 원인 진단 / index.html, js/onestore/OneStoreBoot.js, 은예림_prompt.txt, 은예림_work-log.md / Phaser 일반 스크립트가 SDK 모듈보다 먼저 실행되어 SDK를 게임 코드보다 먼저 로드해야 하는 조건을 위반한 것을 확인함
+2026-11-25 17:03 / 원스토어 SDK 선행 로드 순서 수정 / index.html, 은예림_prompt.txt, 은예림_work-log.md / SDK 인스턴스를 최상위 head 모듈에서 먼저 만든 뒤 Phaser와 게임 부팅 모듈을 동적으로 불러와 원스토어 감지 시점보다 게임 코드가 앞서지 않게 함

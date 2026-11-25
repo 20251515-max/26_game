@@ -2,8 +2,21 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>모찌 공장</title>
+    <script type="module">
+      import { createSDK } from 'https://h5sdk.onestore.net/lib/v1.2.0/onestore-h5-sdk.min.js';
+
+      // SDK가 먼저 원스토어 호스팅 페이지와 연결한 뒤 게임 코드를 불러온다.
+      const sdk = createSDK();
+      const phaserScript = document.createElement('script');
+      phaserScript.src = 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js';
+      phaserScript.addEventListener('load', async () => {
+        const { bootGame } = await import('./js/onestore/OneStoreBoot.js');
+        bootGame(sdk);
+      }, { once: true });
+      document.head.append(phaserScript);
+    </script>
     <style>
       body {
         align-items: center;
@@ -11,7 +24,9 @@
         display: flex;
         justify-content: center;
         margin: 0;
-        min-height: 100vh;
+        min-height: 100dvh;
+        overscroll-behavior: none;
+        padding: var(--safe-top, 0) var(--safe-right, 0) var(--safe-bottom, 0) var(--safe-left, 0);
       }
 
       canvas {
@@ -20,8 +35,5 @@
       }
     </style>
   </head>
-  <body>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
-    <script type="module" src="js/main.js"></script>
-  </body>
+  <body></body>
 </html>
