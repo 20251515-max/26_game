@@ -69,7 +69,11 @@ export class FruitPrep {
   }
 
   hasAnyStock() {
-    return FRUIT_INGREDIENTS.some((fruit) => this.hasStock(fruit));
+    return this.totalStock > 0;
+  }
+
+  get totalStock() {
+    return FRUIT_INGREDIENTS.reduce((sum, fruit) => sum + this.stock[fruit], 0);
   }
 
   useStock(fruit) {

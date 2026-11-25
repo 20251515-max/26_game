@@ -1,10 +1,11 @@
-import { GOAL_SALES, PREP_GOAL_PIECES, PREP_TIME_SECONDS, TIME_LIMIT_SECONDS } from '../config/GameRules.js';
+import { PREP_TIME_SECONDS, TIME_LIMIT_SECONDS, getRoundRules } from '../config/GameRules.js';
 import { playSound } from '../audio/SoundEffects.js';
 import { ROLL_CLICKS, WRAP_CLICKS } from '../production/MochiMaker.js';
 import { CUT_CLICKS, PIECES_PER_PREP, WASH_CLICKS } from '../production/FruitPrep.js';
 
 export const TUTORIAL_ORDER = '딸기 모찌';
 const TUTORIAL_FRUIT = '딸기';
+const FIRST_ROUND = getRoundRules(1);
 const OUTLINE_COLOR = 0x5a466b;
 const DEPTH = 50;
 
@@ -84,17 +85,22 @@ const STEPS = [
     arrow: [1115, 136, 'up'],
   },
   {
-    text: `실전 1단계는 손질 시간이에요.\n${PREP_TIME_SECONDS}초 안에 과일 ${PREP_GOAL_PIECES}개 이상을 손질하지 못하면 실패!`,
+    text: `실전 라운드는 먼저 손질 시간이에요. ${PREP_TIME_SECONDS}초 안에\n손질 재고 ${FIRST_ROUND.prepGoal}개를 만들지 못하면 실패!`,
     target: [800, 27, 190, 102],
     arrow: [895, 136, 'up'],
   },
   {
-    text: `2단계는 영업 시간이에요. 손님이 계속 와요.\n${TIME_LIMIT_SECONDS}초 안에 모찌 ${GOAL_SALES}개를 팔면 성공!`,
+    text: `다음은 영업 시간이에요. 손님이 계속 와요.\n${TIME_LIMIT_SECONDS}초 안에 모찌 ${FIRST_ROUND.goalSales}개를 팔면 다음 라운드로!`,
     target: [75, 518, 270, 44],
     arrow: [352, 540, 'left'],
   },
   {
-    text: '주문한 과일이 다 떨어지면 [다음 손님]을 눌러\n손님을 넘겨요. 그러니 넉넉히 손질해 둬요!',
+    text: '라운드가 오를수록 손님이 줄을 서고, 여러 개를 주문해요.\n왼쪽 게이지가 다 줄면 손님이 떠나니 서둘러요!',
+    target: [48, 158, 324, 414],
+    arrow: [210, 156, 'down'],
+  },
+  {
+    text: '주문한 과일이 모자라면 [다음 손님]을 눌러\n손님을 넘겨요. 그러니 넉넉히 손질해 둬요!',
     target: [92, 454, 236, 72],
     arrow: [332, 486, 'left'],
   },
